@@ -8,5 +8,6 @@ data class Transaction(
     val date: String,
     val time: String,
     val type: String,
-    val balance: Double
+    val balance: Double,
+    val fee: Double
 )

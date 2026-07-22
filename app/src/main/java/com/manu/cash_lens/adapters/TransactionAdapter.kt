@@ -33,6 +33,24 @@ class TransactionAdapter(
         holder.amount.text = "KSh %.2f".format(transaction.amount)
         holder.date.text = "${transaction.date} • ${transaction.time}"
         holder.type.text = transaction.type
+        when (transaction.type) {
+
+            "Received" -> holder.type.setTextColor(
+                android.graphics.Color.parseColor("#2E7D32")
+            )
+
+            "Sent" -> holder.type.setTextColor(
+                android.graphics.Color.parseColor("#D32F2F")
+            )
+
+            "PayBill" -> holder.type.setTextColor(
+                android.graphics.Color.parseColor("#1976D2")
+            )
+
+            else -> holder.type.setTextColor(
+                android.graphics.Color.GRAY
+            )
+        }
     }
 
     override fun getItemCount(): Int = transactions.size

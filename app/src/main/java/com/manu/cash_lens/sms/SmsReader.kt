@@ -145,6 +145,20 @@ class SmsReader(private val context: Context) {
                     } else {
                         0.0
                     }
+                    val feeRegex = Pattern.compile(
+                        "Transaction cost,?\\s*K(?:sh|ES)\\s*([0-9,]+\\.[0-9]{2})",
+                        Pattern.CASE_INSENSITIVE
+                    )
+
+                    val feeMatcher = feeRegex.matcher(body)
+
+                    val fee = if (feeMatcher.find()) {
+                        feeMatcher.group(1)
+                            .replace(",", "")
+                            .toDouble()
+                    } else {
+                        0.0
+                    }
                     val transaction = Transaction(
                         receipt= receipt,
                         amount = amount,
@@ -152,7 +166,8 @@ class SmsReader(private val context: Context) {
                         date = date,
                         time = time,
                         type = type,
-                        balance= balance
+                        balance= balance,
+                        fee= fee
                     )
 
                     messages.add(transaction)

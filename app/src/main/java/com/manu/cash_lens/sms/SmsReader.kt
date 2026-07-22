@@ -119,12 +119,40 @@ class SmsReader(private val context: Context) {
                         date = dateTimeMatcher.group(1)
                         time = dateTimeMatcher.group(2)
                     }
+                    val receiptRegex = Pattern.compile(
+                        "^([A-Z0-9]{10})\\s+Confirmed",
+                        Pattern.CASE_INSENSITIVE
+                    )
+
+                    val receiptMatcher = receiptRegex.matcher(body)
+
+                    val receipt = if (receiptMatcher.find()) {
+                        receiptMatcher.group(1)
+                    } else {
+                        ""
+                    }
+                    val balanceRegex = Pattern.compile(
+                        "New M-PESA balance is Ksh([0-9,]+\\.[0-9]{2})",
+                        Pattern.CASE_INSENSITIVE
+                    )
+
+                    val balanceMatcher = balanceRegex.matcher(body)
+
+                    val balance = if (balanceMatcher.find()) {
+                        balanceMatcher.group(1)
+                            .replace(",", "")
+                            .toDouble()
+                    } else {
+                        0.0
+                    }
                     val transaction = Transaction(
+                        receipt= receipt,
                         amount = amount,
                         recipient = recipient,
                         date = date,
                         time = time,
-                        type = type
+                        type = type,
+                        balance= balance
                     )
 
                     messages.add(transaction)

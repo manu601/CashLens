@@ -5,5 +5,6 @@ data class Transaction(
     val amount: Double,
     val recipient: String,
     val date: String,
+    val time: String,
     val type: String
 )

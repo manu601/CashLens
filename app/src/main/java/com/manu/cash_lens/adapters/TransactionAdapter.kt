@@ -16,6 +16,7 @@ class TransactionAdapter(
         val recipient: TextView = itemView.findViewById(R.id.txtRecipient)
         val amount: TextView = itemView.findViewById(R.id.txtAmount)
         val date: TextView = itemView.findViewById(R.id.txtDate)
+        val type: TextView = itemView.findViewById(R.id.txtType)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -30,7 +31,8 @@ class TransactionAdapter(
 
         holder.recipient.text = transaction.recipient
         holder.amount.text = "KSh %.2f".format(transaction.amount)
-        holder.date.text = transaction.date
+        holder.date.text = "${transaction.date} • ${transaction.time}"
+        holder.type.text = transaction.type
     }
 
     override fun getItemCount(): Int = transactions.size

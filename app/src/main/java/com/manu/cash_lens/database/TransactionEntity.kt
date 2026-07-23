@@ -6,8 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "transactions")
 data class TransactionEntity(
 
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey
+    val receipt: String,
+
+    val provider: String,
 
     val amount: Double,
 
@@ -15,5 +17,13 @@ data class TransactionEntity(
 
     val date: String,
 
-    val type: String
+    val time: String,
+
+    val type: String,
+
+    val balance: Double,
+
+    val fee: Double,
+
+    val smsTimestamp: Long
 )

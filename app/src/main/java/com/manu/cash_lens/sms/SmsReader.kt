@@ -35,16 +35,16 @@ class SmsReader(private val context: Context) {
 
             while (it.moveToNext()) {
 
-                val sender = it.getString(addressIndex)
+                val provider = it.getString(addressIndex)
                 val body = it.getString(bodyIndex)
                 Log.d("MPESA_SMS", body)
 
                 // Only keep M-Pesa messages
 
                 if (
+                    provider.equals("MPESA", ignoreCase = true) &&
                     body.contains("Confirmed", true) &&
-                    body.contains("New M-PESA balance", true) &&
-                    body.contains("Ksh", true)
+                    body.contains("New M-PESA balance", true)
 
                 ) {
                     val amountRegex = Pattern.compile("Ksh([0-9,]+\\.[0-9]{2})", Pattern.CASE_INSENSITIVE)
@@ -161,6 +161,7 @@ class SmsReader(private val context: Context) {
                     }
                     val transaction = Transaction(
                         receipt= receipt,
+                        provider= provider,
                         amount = amount,
                         recipient = recipient,
                         date = date,

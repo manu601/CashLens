@@ -28,11 +28,40 @@ class TransactionAdapter(
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         val transaction = transactions[position]
+        val formattedAmount = String.format(
+            "KSh %,d",
+            transaction.amount.toInt()
+        )
+
 
         holder.recipient.text = transaction.recipient
-        holder.amount.text = "KSh %.2f".format(transaction.amount)
         holder.date.text = "${transaction.date} • ${transaction.time}"
         holder.type.text = transaction.type
+        holder.amount.text = formattedAmount
+        when (transaction.type) {
+
+            "Received" -> {
+                holder.amount.setTextColor(
+                    android.graphics.Color.parseColor("#2E7D32")
+                )
+                holder.amount.text = "+ $formattedAmount"
+            }
+
+            "Sent" -> {
+                holder.amount.setTextColor(
+                    android.graphics.Color.parseColor("#D32F2F")
+                )
+                holder.amount.text = "- $formattedAmount"
+            }
+
+            "PayBill" -> {
+                holder.amount.setTextColor(
+                    android.graphics.Color.parseColor("#F57C00")
+                )
+                holder.amount.text = "- $formattedAmount"
+            }
+
+        }
         when (transaction.type) {
 
             "Received" -> holder.type.setTextColor(
@@ -50,6 +79,7 @@ class TransactionAdapter(
             else -> holder.type.setTextColor(
                 android.graphics.Color.GRAY
             )
+
         }
     }
 

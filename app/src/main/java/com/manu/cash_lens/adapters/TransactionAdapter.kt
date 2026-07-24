@@ -38,6 +38,11 @@ class TransactionAdapter(
         holder.date.text = "${transaction.date} • ${transaction.time}"
         holder.type.text = transaction.type
         holder.amount.text = formattedAmount
+        holder.recipient.text = when(transaction.type) {
+            "FulizaBorrow" -> "Fuliza Borrow"
+            "FulizaRepayment" -> "Fuliza Repayment"
+            else -> transaction.recipient
+        }
         when (transaction.type) {
 
             "Received" -> {

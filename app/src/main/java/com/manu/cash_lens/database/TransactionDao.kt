@@ -19,4 +19,7 @@ interface TransactionDao {
 
     @Query("DELETE FROM transactions")
     suspend fun deleteAll()
+
+    @Query("SELECT balance FROM transactions ORDER BY smsTimestamp DESC LIMIT 1")
+    suspend fun getCurrentBalance(): Double?
 }

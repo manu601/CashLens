@@ -21,4 +21,7 @@ class TransactionRepository(
     suspend fun receiptExists(receipt: String): Boolean {
         return transactionDao.receiptExists(receipt)
     }
+    suspend fun getCurrentBalance(): Double? {
+        return transactionDao.getCurrentBalance()
+    }
 }

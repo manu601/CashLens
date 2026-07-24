@@ -10,5 +10,6 @@ data class Transaction(
     val time: String,
     val type: String,
     val balance: Double,
-    val fee: Double
+    val fee: Double,
+    val smsTimestamp: Long
 )

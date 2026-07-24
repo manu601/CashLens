@@ -80,7 +80,39 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Import M-PESA Messages"/>
+        <!--Database Reset Button-->
+        <Button
+            android:id="@+id/btnResetDatabase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Reset Database"
+            android:backgroundTint="#D32F2F"
+            android:textColor="#FFFFFF"/>
 
+        <LinearLayout
+            android:id="@+id/importStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/importText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Importing transactions..."
+                android:textSize="16sp"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:id="@+id/importProgress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"/>
+
+        </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerTransactions"
             android:layout_width="match_parent"

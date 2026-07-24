@@ -131,6 +131,13 @@ class MainActivity : AppCompatActivity() {
                 )
 
                 balanceText.text = "Ksh %.2f".format(currentBalance)
+                val fuliza = smsReader.getLatestFulizaStatus()
+
+                val outstandingText = findViewById<TextView>(R.id.txtFulizaOutstanding)
+                val limitText = findViewById<TextView>(R.id.txtFulizaLimit)
+
+                outstandingText.text = "KSh %.2f".format(fuliza.outstanding)
+                limitText.text = "KSh %.2f".format(fuliza.availableLimit)
 
                 recycler.adapter = TransactionAdapter(displayList)
                 importStatus.visibility = View.GONE

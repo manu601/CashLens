@@ -22,4 +22,26 @@ interface TransactionDao {
 
     @Query("SELECT balance FROM transactions ORDER BY smsTimestamp DESC LIMIT 1")
     suspend fun getCurrentBalance(): Double?
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM transactions
+    WHERE type = 'Sent'
+""")
+    suspend fun getTotalSent(): Double
+
+
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM transactions
+    WHERE type = 'Received'
+""")
+    suspend fun getTotalReceived(): Double
+
+
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM transactions
+    WHERE type = 'PayBill'
+""")
+    suspend fun getTotalPayBill(): Double
 }

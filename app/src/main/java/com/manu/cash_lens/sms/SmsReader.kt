@@ -261,4 +261,72 @@ class SmsReader(private val context: Context) {
 
         return messages
     }
+    fun getLatestFulizaStatus(): com.manu.cash_lens.models.FulizaStatus {
+
+        var outstanding = 0.0
+        var available = 0.0
+
+        val cursor = context.contentResolver.query(
+            Telephony.Sms.CONTENT_URI,
+            arrayOf(
+                Telephony.Sms.ADDRESS,
+                Telephony.Sms.BODY
+            ),
+            null,
+            null,
+            "${Telephony.Sms.DATE} DESC"
+        )
+
+        cursor?.use {
+
+            val addressIndex = it.getColumnIndex(Telephony.Sms.ADDRESS)
+            val bodyIndex = it.getColumnIndex(Telephony.Sms.BODY)
+
+            while (it.moveToNext()) {
+
+                val provider = it.getString(addressIndex)
+                val body = it.getString(bodyIndex)
+
+                if (!provider.equals("MPESA", true))
+                    continue
+
+                // Outstanding amount
+                val outstandingRegex = Pattern.compile(
+                    "outstanding amount is Ksh\\s*([0-9,]+\\.[0-9]{2})",
+                    Pattern.CASE_INSENSITIVE
+                )
+
+                val outstandingMatcher = outstandingRegex.matcher(body)
+
+                if (outstandingMatcher.find()) {
+
+                    outstanding = outstandingMatcher.group(1)
+                        .replace(",", "")
+                        .toDouble()
+                }
+
+                // Available limit
+                val availableRegex = Pattern.compile(
+                    "Available Fuliza M-PESA limit is Ksh\\s*([0-9,]+\\.[0-9]{2})",
+                    Pattern.CASE_INSENSITIVE
+                )
+
+                val availableMatcher = availableRegex.matcher(body)
+
+                if (availableMatcher.find()) {
+
+                    available = availableMatcher.group(1)
+                        .replace(",", "")
+                        .toDouble()
+
+                    break
+                }
+            }
+        }
+
+        return com.manu.cash_lens.models.FulizaStatus(
+            outstanding,
+            available
+        )
+    }
 }

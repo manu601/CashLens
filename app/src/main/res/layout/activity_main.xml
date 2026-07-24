@@ -50,6 +50,54 @@
                 android:textStyle="bold"
                 android:layout_marginTop="8dp"/>
         </LinearLayout>
+        <!--Fuliza satus-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fuliza Outstanding"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtFulizaOutstanding"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KSh 0.00"
+                    android:textSize="20sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Available Fuliza"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/txtFulizaLimit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KSh 0.00"
+                    android:textSize="20sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <!-- Spending -->
         <TextView

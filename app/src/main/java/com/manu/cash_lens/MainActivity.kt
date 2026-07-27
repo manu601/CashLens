@@ -295,7 +295,7 @@ class MainActivity : AppCompatActivity() {
                 is TransactionListItem.Header -> {
 
                     currentHeader = item
-                    filteredList.add(item)
+                    headerAdded = false
                 }
 
                 is TransactionListItem.Item -> {
@@ -309,46 +309,103 @@ class MainActivity : AppCompatActivity() {
                                 t.receipt.lowercase().contains(currentSearch) ||
                                 t.amount.toString().contains(currentSearch)
 
-                    if (matches && currentHeader?.expanded == true) {
+                    if (matches) {
 
-                        filteredList.add(item)
+                        if (!headerAdded && currentHeader != null) {
+                            filteredList.add(currentHeader!!)
+                            headerAdded = true
+                        }
 
+                        if (currentHeader?.expanded == true) {
+                            filteredList.add(item)
+                        }
                     }
                 }
             }
         }
-        val finalList = when (currentSort) {
 
-            "Newest" -> filteredList
 
-            "Oldest" -> filteredList.reversed()
+        val finalList = mutableListOf<TransactionListItem>()
 
-            "Highest Amount" -> {
+        var monthTransactions =
+            mutableListOf<TransactionListItem.Item>()
 
-                filteredList.filterIsInstance<TransactionListItem.Item>()
-                    .sortedByDescending { it.transaction.amount }
+        var activeHeader: TransactionListItem.Header? = null
+
+
+        fun addMonth() {
+
+            if (activeHeader != null) {
+
+                // Always show month header
+                finalList.add(activeHeader!!)
+
+
+                // Show transactions only if expanded
+                if (activeHeader!!.expanded) {
+
+                    finalList.addAll(
+                        when (currentSort) {
+
+                            "Highest Amount" ->
+                                monthTransactions.sortedByDescending {
+                                    it.transaction.amount
+                                }
+
+                            "Lowest Amount" ->
+                                monthTransactions.sortedBy {
+                                    it.transaction.amount
+                                }
+
+                            "Recipient A-Z" ->
+                                monthTransactions.sortedBy {
+                                    it.transaction.recipient
+                                }
+
+                            "Recipient Z-A" ->
+                                monthTransactions.sortedByDescending {
+                                    it.transaction.recipient
+                                }
+
+                            "Oldest" ->
+                                monthTransactions.sortedBy {
+                                    it.transaction.smsTimestamp
+                                }
+
+                            else ->
+                                monthTransactions
+                        }
+                    )
+                }
             }
 
-            "Lowest Amount" -> {
-
-                filteredList.filterIsInstance<TransactionListItem.Item>()
-                    .sortedBy { it.transaction.amount }
-            }
-
-            "Recipient A-Z" -> {
-
-                filteredList.filterIsInstance<TransactionListItem.Item>()
-                    .sortedBy { it.transaction.recipient }
-            }
-
-            "Recipient Z-A" -> {
-
-                filteredList.filterIsInstance<TransactionListItem.Item>()
-                    .sortedByDescending { it.transaction.recipient }
-            }
-
-            else -> filteredList
+            monthTransactions.clear()
         }
+
+
+        filteredList.forEach { item ->
+
+            when (item) {
+
+                is TransactionListItem.Header -> {
+
+                    addMonth()
+
+                    activeHeader = item
+                }
+
+
+                is TransactionListItem.Item -> {
+
+                    monthTransactions.add(item)
+                }
+            }
+        }
+
+
+        // Add last month
+        addMonth()
+
 
         adapter.updateData(finalList)
     }

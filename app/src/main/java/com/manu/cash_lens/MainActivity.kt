@@ -238,6 +238,13 @@ class MainActivity : AppCompatActivity() {
                 limitText.text = "KSh %.2f".format(fuliza.availableLimit)
 
                 val listItems = buildTransactionList(displayList)
+                listItems.forEachIndexed { index, item ->
+
+                    if (item is TransactionListItem.Header) {
+                        item.expanded = index == 0
+                    }
+
+                }
                 adapter = TransactionAdapter(listItems) { header ->
 
                     header.expanded = !header.expanded

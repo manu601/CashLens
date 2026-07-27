@@ -30,6 +30,7 @@ import android.widget.AdapterView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: TransactionAdapter
@@ -159,7 +160,9 @@ class MainActivity : AppCompatActivity() {
 
 
                 // Convert Entity -> UI model
-                val displayList = savedTransactions.map {
+                val displayList = savedTransactions
+                    .sortedByDescending { it.smsTimestamp }
+                    .map {
 
                     com.manu.cash_lens.models.Transaction(
                         receipt = it.receipt,
@@ -199,19 +202,19 @@ class MainActivity : AppCompatActivity() {
                 }.timeInMillis
 
 
-                val todaySent = repository.getSentSince(today)
+                val todaySpent = repository.getSentSince(today)
                 val todayReceived = repository.getReceivedSince(today)
 
-                val monthSent = repository.getSentSince(thisMonth)
+                val monthSpent = repository.getSentSince(thisMonth)
                 val monthReceived = repository.getReceivedSince(thisMonth)
 
 
                 Log.d(
                     "SUMMARY",
                     """
-    Today Sent: $todaySent
+    Today Spent: $todaySpent
     Today Received: $todayReceived
-    Month Sent: $monthSent
+    Month Sent: $monthSpent
     Month Received: $monthReceived
     """.trimIndent()
 
@@ -220,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                     "KSh %.2f".format(monthReceived)
 
                 findViewById<TextView>(R.id.txtSentMonth).text =
-                    "KSh %.2f".format(monthSent)
+                    "KSh %.2f".format(monthSpent)
 
                 Log.d(
                     "DASHBOARD_BALANCE",
@@ -284,6 +287,14 @@ class MainActivity : AppCompatActivity() {
                 importStatus.visibility = View.GONE
                 importButton.isEnabled = true
             }
+        }
+        val analyticsButton = findViewById<Button>(R.id.btnAnalytics)
+
+        analyticsButton.setOnClickListener {
+
+            val intent = Intent(this, AnalyticsActivity::class.java)
+            startActivity(intent)
+
         }
     }
     private fun updateTransactionList() {

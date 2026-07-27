@@ -21,7 +21,12 @@ class TransactionAdapter(
     }
 
     class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val header: TextView = itemView.findViewById(R.id.txtMonthHeader)
+
+        val header: TextView =
+            itemView.findViewById(R.id.txtMonthHeader)
+
+        val arrow: TextView =
+            itemView.findViewById(R.id.txtArrow)
     }
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -66,6 +71,8 @@ class TransactionAdapter(
                 val viewHolder = holder as HeaderViewHolder
 
                 viewHolder.header.text = item.title
+                viewHolder.arrow.text =
+                    if (item.expanded) "▼" else "▶"
 
                 viewHolder.itemView.setOnClickListener {
                     onHeaderClick(item)
@@ -84,8 +91,8 @@ class TransactionAdapter(
                 )
 
                 viewHolder.recipient.text = when (transaction.type) {
-                    "FulizaBorrow" -> "Fuliza Borrow"
-                    "FulizaRepayment" -> "Fuliza Repayment"
+                    "Fuliza Borrow" -> "Fuliza Borrow"
+                    "Fuliza Repayment" -> "Fuliza Repayment"
                     else -> transaction.recipient
                 }
 
@@ -115,7 +122,7 @@ class TransactionAdapter(
                     }
 
                     "PayBill",
-                    "FulizaRepayment" -> {
+                    "Fuliza Repayment" -> {
 
                         viewHolder.amount.setTextColor(
                             Color.parseColor("#F57C00")
@@ -147,7 +154,7 @@ class TransactionAdapter(
                             Color.parseColor("#1976D2")
                         )
 
-                    "FulizaRepayment" ->
+                    "Fuliza Repayment" ->
                         viewHolder.type.setTextColor(
                             Color.parseColor("#F57C00")
                         )

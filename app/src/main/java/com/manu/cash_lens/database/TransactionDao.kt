@@ -70,4 +70,28 @@ interface TransactionDao {
     WHERE type = 'PayBill'
 """)
     suspend fun getTotalPayBill(): Double
+
+
+
+    @Query("""
+    SELECT COALESCE(SUM(amount),0)
+    FROM transactions
+    WHERE type IN ('Sent','PayBill','FulizaRepayment')
+""")
+    suspend fun getTotalSpent(): Double
+
+
+    @Query("""
+    SELECT COUNT(*)
+    FROM transactions
+""")
+    suspend fun getTransactionCount(): Int
+
+    @Query("""
+    SELECT COALESCE(SUM(amount),0)
+    FROM transactions
+    WHERE type IN ('Sent','PayBill','Fuliza Repayment')
+    AND smsTimestamp >= :startTime
+""")
+    suspend fun getSpentSince(startTime: Long): Double
 }

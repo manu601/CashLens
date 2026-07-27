@@ -18,23 +18,31 @@ class TransactionRepository(
     suspend fun deleteAll() {
         transactionDao.deleteAll()
     }
+
     suspend fun receiptExists(receipt: String): Boolean {
         return transactionDao.receiptExists(receipt)
     }
+
     suspend fun getCurrentBalance(): Double? {
         return transactionDao.getCurrentBalance()
     }
+
     suspend fun getSentSince(startTime: Long): Double {
         return transactionDao.getSentSince(startTime)
     }
 
     suspend fun getReceivedSince(startTime: Long): Double {
         return transactionDao.getReceivedSince(startTime)
+
+
     }
 
     suspend fun getPayBillSince(startTime: Long): Double {
         return transactionDao.getPayBillSince(startTime)
     }
+
+    // Analytics totals
+
     suspend fun getTotalSent(): Double {
         return transactionDao.getTotalSent()
     }
@@ -45,5 +53,16 @@ class TransactionRepository(
 
     suspend fun getTotalPayBill(): Double {
         return transactionDao.getTotalPayBill()
+    }
+
+    suspend fun getTotalSpent(): Double {
+        return transactionDao.getTotalSpent()
+    }
+
+    suspend fun getTransactionCount(): Int {
+        return transactionDao.getTransactionCount()
+    }
+    suspend fun getSpentSince(startTime: Long): Double {
+        return transactionDao.getSpentSince(startTime)
     }
 }

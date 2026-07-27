@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Analytics"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:paddingBottom="20dp"/>
+
+    <Button
+        android:id="@+id/btnToday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Today"/>
+
+    <Button
+        android:id="@+id/btnWeek"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This Week"/>
+
+    <Button
+        android:id="@+id/btnMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="This Month"/>
+
+
+    <TextView
+        android:id="@+id/txtTotalReceived"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Money In"
+        android:textSize="18sp"
+        android:padding="16dp"/>
+
+
+    <TextView
+        android:id="@+id/txtTotalSent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Money Out"
+        android:textSize="18sp"
+        android:padding="16dp"/>
+
+
+    <TextView
+        android:id="@+id/txtTotalPayBill"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="PayBill"
+        android:textSize="18sp"
+        android:padding="16dp"/>
+
+
+    <TextView
+        android:id="@+id/txtTransactionCount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transactions"
+        android:textSize="18sp"
+        android:padding="16dp"/>
+
+
+
+
+</LinearLayout>

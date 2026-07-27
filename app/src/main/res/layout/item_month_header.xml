@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/txtMonthHeader"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:paddingTop="20dp"
     android:paddingBottom="10dp"
     android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:text="July 2026"
-    android:textStyle="bold"
-    android:textSize="18sp"
-    android:textColor="#2E7D32"/>
+    android:paddingEnd="16dp">
+
+    <TextView
+        android:id="@+id/txtArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="▼"
+        android:textSize="18sp"
+        android:layout_marginEnd="12dp"/>
+
+    <TextView
+        android:id="@+id/txtMonthHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="July 2026"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#2E7D32"/>
+
+</LinearLayout>

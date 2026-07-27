@@ -24,4 +24,26 @@ class TransactionRepository(
     suspend fun getCurrentBalance(): Double? {
         return transactionDao.getCurrentBalance()
     }
+    suspend fun getSentSince(startTime: Long): Double {
+        return transactionDao.getSentSince(startTime)
+    }
+
+    suspend fun getReceivedSince(startTime: Long): Double {
+        return transactionDao.getReceivedSince(startTime)
+    }
+
+    suspend fun getPayBillSince(startTime: Long): Double {
+        return transactionDao.getPayBillSince(startTime)
+    }
+    suspend fun getTotalSent(): Double {
+        return transactionDao.getTotalSent()
+    }
+
+    suspend fun getTotalReceived(): Double {
+        return transactionDao.getTotalReceived()
+    }
+
+    suspend fun getTotalPayBill(): Double {
+        return transactionDao.getTotalPayBill()
+    }
 }

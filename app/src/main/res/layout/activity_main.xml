@@ -108,11 +108,96 @@
             android:textSize="18sp"
             android:layout_marginTop="24dp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- Money Summary Cards -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="KSh 0.00"
-            android:textSize="22sp"/>
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginTop="24dp">
+
+
+            <!-- Money In Card -->
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/money_in_card">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📥 Money In"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/txtReceivedMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KSh 0.00"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/txtReceivedLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This Month"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+
+
+            <!-- Money Out Card -->
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/money_out_card">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📤 Money Out"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+
+                <TextView
+                    android:id="@+id/txtSentMonth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KSh 0.00"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"/>
+
+
+                <TextView
+                    android:id="@+id/txtSentLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This Month"
+                    android:textSize="14sp"/>
+
+
+            </LinearLayout>
+
+
+        </LinearLayout>
 
         <!-- Recent Transactions -->
         <TextView
@@ -122,6 +207,23 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:layout_marginTop="24dp"/>
+        <!--Sort-->
+        <Spinner
+            android:id="@+id/spinnerSort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <!--Search-->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Search transactions..."
+            android:padding="12dp"
+            android:inputType="text"
+            android:background="@android:drawable/edit_text"/>
         <Button
             android:id="@+id/btnImportSms"
             android:layout_width="match_parent"

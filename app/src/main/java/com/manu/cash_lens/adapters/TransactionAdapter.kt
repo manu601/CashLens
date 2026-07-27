@@ -1,5 +1,6 @@
 package com.manu.cash_lens.adapters
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,10 +8,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.manu.cash_lens.R
 import com.manu.cash_lens.models.Transaction
+import com.manu.cash_lens.models.TransactionListItem
 
 class TransactionAdapter(
-    private val transactions: List<Transaction>
-) : RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder>() {
+    private var items: List<TransactionListItem>
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    companion object {
+        private const val TYPE_HEADER = 0
+        private const val TYPE_TRANSACTION = 1
+    }
+
+    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val header: TextView = itemView.findViewById(R.id.txtMonthHeader)
+    }
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val recipient: TextView = itemView.findViewById(R.id.txtRecipient)
@@ -19,74 +30,131 @@ class TransactionAdapter(
         val type: TextView = itemView.findViewById(R.id.txtType)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_transaction, parent, false)
+    override fun getItemViewType(position: Int): Int {
 
-        return TransactionViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        val transaction = transactions[position]
-        val formattedAmount = String.format(
-            "KSh %,d",
-            transaction.amount.toInt()
-        )
-
-
-        holder.recipient.text = transaction.recipient
-        holder.date.text = "${transaction.date} • ${transaction.time}"
-        holder.type.text = transaction.type
-        holder.amount.text = formattedAmount
-        holder.recipient.text = when(transaction.type) {
-            "FulizaBorrow" -> "Fuliza Borrow"
-            "FulizaRepayment" -> "Fuliza Repayment"
-            else -> transaction.recipient
-        }
-        when (transaction.type) {
-
-            "Received" -> {
-                holder.amount.setTextColor(
-                    android.graphics.Color.parseColor("#2E7D32")
-                )
-                holder.amount.text = "+ $formattedAmount"
-            }
-
-            "Sent" -> {
-                holder.amount.setTextColor(
-                    android.graphics.Color.parseColor("#D32F2F")
-                )
-                holder.amount.text = "- $formattedAmount"
-            }
-
-            "PayBill" -> {
-                holder.amount.setTextColor(
-                    android.graphics.Color.parseColor("#F57C00")
-                )
-                holder.amount.text = "- $formattedAmount"
-            }
-
-        }
-        when (transaction.type) {
-
-            "Received" -> holder.type.setTextColor(
-                android.graphics.Color.parseColor("#2E7D32")
-            )
-
-            "Sent" -> holder.type.setTextColor(
-                android.graphics.Color.parseColor("#D32F2F")
-            )
-
-            "PayBill" -> holder.type.setTextColor(
-                android.graphics.Color.parseColor("#1976D2")
-            )
-
-            else -> holder.type.setTextColor(
-                android.graphics.Color.GRAY
-            )
-
+        return when (items[position]) {
+            is TransactionListItem.Header -> TYPE_HEADER
+            is TransactionListItem.Item -> TYPE_TRANSACTION
         }
     }
 
-    override fun getItemCount(): Int = transactions.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+
+        return if (viewType == TYPE_HEADER) {
+
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_month_header, parent, false)
+
+            HeaderViewHolder(view)
+
+        } else {
+
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_transaction, parent, false)
+
+            TransactionViewHolder(view)
+        }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
+        when (val item = items[position]) {
+
+            is TransactionListItem.Header -> {
+
+                (holder as HeaderViewHolder).header.text = item.title
+            }
+
+            is TransactionListItem.Item -> {
+
+                val transaction: Transaction = item.transaction
+
+                val viewHolder = holder as TransactionViewHolder
+
+                val formattedAmount = String.format(
+                    "KSh %,d",
+                    transaction.amount.toInt()
+                )
+
+                viewHolder.recipient.text = when (transaction.type) {
+                    "FulizaBorrow" -> "Fuliza Borrow"
+                    "FulizaRepayment" -> "Fuliza Repayment"
+                    else -> transaction.recipient
+                }
+
+                viewHolder.date.text =
+                    "${transaction.date} • ${transaction.time}"
+
+                viewHolder.type.text = transaction.type
+
+                when (transaction.type) {
+
+                    "Received" -> {
+
+                        viewHolder.amount.setTextColor(
+                            Color.parseColor("#2E7D32")
+                        )
+
+                        viewHolder.amount.text = "+ $formattedAmount"
+                    }
+
+                    "Sent" -> {
+
+                        viewHolder.amount.setTextColor(
+                            Color.parseColor("#D32F2F")
+                        )
+
+                        viewHolder.amount.text = "- $formattedAmount"
+                    }
+
+                    "PayBill",
+                    "FulizaRepayment" -> {
+
+                        viewHolder.amount.setTextColor(
+                            Color.parseColor("#F57C00")
+                        )
+
+                        viewHolder.amount.text = "- $formattedAmount"
+                    }
+
+                    else -> {
+
+                        viewHolder.amount.text = formattedAmount
+                    }
+                }
+
+                when (transaction.type) {
+
+                    "Received" ->
+                        viewHolder.type.setTextColor(
+                            Color.parseColor("#2E7D32")
+                        )
+
+                    "Sent" ->
+                        viewHolder.type.setTextColor(
+                            Color.parseColor("#D32F2F")
+                        )
+
+                    "PayBill" ->
+                        viewHolder.type.setTextColor(
+                            Color.parseColor("#1976D2")
+                        )
+
+                    "FulizaRepayment" ->
+                        viewHolder.type.setTextColor(
+                            Color.parseColor("#F57C00")
+                        )
+
+                    else ->
+                        viewHolder.type.setTextColor(Color.GRAY)
+                }
+            }
+        }
+    }
+
+    override fun getItemCount(): Int = items.size
+    fun updateData(newItems: List<TransactionListItem>) {
+        items = newItems
+        notifyDataSetChanged()
+    }
 }

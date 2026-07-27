@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     private var originalList =
         mutableListOf<com.manu.cash_lens.models.TransactionListItem>()
     private var currentSort = "Newest"
+    private var currentSearch = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -255,54 +256,10 @@ class MainActivity : AppCompatActivity() {
                         count: Int
                     ) {
 
-                        val query = s.toString().trim().lowercase()
+                        currentSearch = s.toString().trim().lowercase()
 
-                        if (query.isEmpty()) {
-                            adapter.updateData(originalList)
-                            return
-                        }
 
-                        val filteredList = mutableListOf<com.manu.cash_lens.models.TransactionListItem>()
-
-                        var currentHeader:
-                                com.manu.cash_lens.models.TransactionListItem.Header? = null
-
-                        var headerAdded = false
-
-                        originalList.forEach { item ->
-
-                            when (item) {
-
-                                is com.manu.cash_lens.models.TransactionListItem.Header -> {
-
-                                    currentHeader = item
-                                    headerAdded = false
-                                }
-
-                                is com.manu.cash_lens.models.TransactionListItem.Item -> {
-
-                                    val t = item.transaction
-
-                                    val matches =
-                                        t.recipient.lowercase().contains(query) ||
-                                                t.type.lowercase().contains(query) ||
-                                                t.receipt.lowercase().contains(query) ||
-                                                t.amount.toString().contains(query)
-
-                                    if (matches) {
-
-                                        if (!headerAdded && currentHeader != null) {
-                                            filteredList.add(currentHeader!!)
-                                            headerAdded = true
-                                        }
-
-                                        filteredList.add(item)
-                                    }
-                                }
-                            }
-                        }
-
-                        adapter.updateData(filteredList)
+                        updateTransactionList()
                     }
 
                     override fun afterTextChanged(s: Editable?) {}
@@ -314,72 +271,81 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun updateTransactionList() {
+
         if (!::adapter.isInitialized) return
 
-        val sorted = when (currentSort) {
+        val filteredList = mutableListOf<TransactionListItem>()
 
-            "Newest" ->
-                originalList
+        var currentHeader: TransactionListItem.Header? = null
+        var headerAdded = false
 
-            "Oldest" ->
-                originalList.reversed()
+        originalList.forEach { item ->
+
+            when (item) {
+
+                is TransactionListItem.Header -> {
+                    currentHeader = item
+                    headerAdded = false
+                }
+
+                is TransactionListItem.Item -> {
+
+                    val t = item.transaction
+
+                    val matches =
+                        currentSearch.isBlank() ||
+                                t.recipient.lowercase().contains(currentSearch) ||
+                                t.type.lowercase().contains(currentSearch) ||
+                                t.receipt.lowercase().contains(currentSearch) ||
+                                t.amount.toString().contains(currentSearch)
+
+                    if (matches) {
+
+                        if (!headerAdded && currentHeader != null) {
+                            filteredList.add(currentHeader!!)
+                            headerAdded = true
+                        }
+
+                        filteredList.add(item)
+                    }
+                }
+            }
+        }
+
+        val finalList = when (currentSort) {
+
+            "Newest" -> filteredList
+
+            "Oldest" -> filteredList.reversed()
 
             "Highest Amount" -> {
 
-                val headers = mutableListOf<TransactionListItem>()
-
-                val transactions = originalList
-                    .filterIsInstance<TransactionListItem.Item>()
+                filteredList.filterIsInstance<TransactionListItem.Item>()
                     .sortedByDescending { it.transaction.amount }
-
-                headers.addAll(transactions)
-
-                headers
             }
 
             "Lowest Amount" -> {
 
-                val headers = mutableListOf<TransactionListItem>()
-
-                val transactions = originalList
-                    .filterIsInstance<TransactionListItem.Item>()
+                filteredList.filterIsInstance<TransactionListItem.Item>()
                     .sortedBy { it.transaction.amount }
-
-                headers.addAll(transactions)
-
-                headers
             }
 
             "Recipient A-Z" -> {
 
-                val headers = mutableListOf<TransactionListItem>()
-
-                val transactions = originalList
-                    .filterIsInstance<TransactionListItem.Item>()
+                filteredList.filterIsInstance<TransactionListItem.Item>()
                     .sortedBy { it.transaction.recipient }
-
-                headers.addAll(transactions)
-
-                headers
             }
 
             "Recipient Z-A" -> {
 
-                val headers = mutableListOf<TransactionListItem>()
-
-                val transactions = originalList
-                    .filterIsInstance<TransactionListItem.Item>()
+                filteredList.filterIsInstance<TransactionListItem.Item>()
                     .sortedByDescending { it.transaction.recipient }
-
-                headers.addAll(transactions)
-
-                headers
             }
 
-            else -> originalList
+            else -> filteredList
         }
 
-        adapter.updateData(sorted)
+        adapter.updateData(finalList)
     }
     private fun buildTransactionList(
         displayList: List<Transaction>

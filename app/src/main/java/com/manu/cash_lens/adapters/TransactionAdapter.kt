@@ -11,7 +11,8 @@ import com.manu.cash_lens.models.Transaction
 import com.manu.cash_lens.models.TransactionListItem
 
 class TransactionAdapter(
-    private var items: List<TransactionListItem>
+    private var transactions: List<TransactionListItem>,
+    private val onHeaderClick: (TransactionListItem.Header) -> Unit = {}
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -32,7 +33,7 @@ class TransactionAdapter(
 
     override fun getItemViewType(position: Int): Int {
 
-        return when (items[position]) {
+        return when (transactions[position]) {
             is TransactionListItem.Header -> TYPE_HEADER
             is TransactionListItem.Item -> TYPE_TRANSACTION
         }
@@ -58,11 +59,17 @@ class TransactionAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
-        when (val item = items[position]) {
+        when (val item = transactions[position]) {
 
             is TransactionListItem.Header -> {
 
-                (holder as HeaderViewHolder).header.text = item.title
+                val viewHolder = holder as HeaderViewHolder
+
+                viewHolder.header.text = item.title
+
+                viewHolder.itemView.setOnClickListener {
+                    onHeaderClick(item)
+                }
             }
 
             is TransactionListItem.Item -> {
@@ -152,9 +159,9 @@ class TransactionAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = transactions.size
     fun updateData(newItems: List<TransactionListItem>) {
-        items = newItems
+        transactions = newItems
         notifyDataSetChanged()
     }
 }

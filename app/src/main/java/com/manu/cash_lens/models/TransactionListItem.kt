@@ -3,7 +3,8 @@ package com.manu.cash_lens.models
 sealed class TransactionListItem {
 
     data class Header(
-        val title: String
+        val title: String,
+        var expanded: Boolean = true
     ) : TransactionListItem()
 
     data class Item(

@@ -27,6 +27,9 @@ import android.widget.ArrayAdapter
 import com.manu.cash_lens.models.Transaction
 import com.manu.cash_lens.models.TransactionListItem
 import android.widget.AdapterView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: TransactionAdapter
@@ -235,7 +238,13 @@ class MainActivity : AppCompatActivity() {
                 limitText.text = "KSh %.2f".format(fuliza.availableLimit)
 
                 val listItems = buildTransactionList(displayList)
-                adapter = TransactionAdapter(listItems)
+                adapter = TransactionAdapter(listItems) { header ->
+
+                    header.expanded = !header.expanded
+
+                    updateTransactionList()
+
+                }
                 recycler.adapter = adapter
 
                 originalList.clear()
@@ -284,8 +293,9 @@ class MainActivity : AppCompatActivity() {
             when (item) {
 
                 is TransactionListItem.Header -> {
+
                     currentHeader = item
-                    headerAdded = false
+                    filteredList.add(item)
                 }
 
                 is TransactionListItem.Item -> {
@@ -299,19 +309,14 @@ class MainActivity : AppCompatActivity() {
                                 t.receipt.lowercase().contains(currentSearch) ||
                                 t.amount.toString().contains(currentSearch)
 
-                    if (matches) {
-
-                        if (!headerAdded && currentHeader != null) {
-                            filteredList.add(currentHeader!!)
-                            headerAdded = true
-                        }
+                    if (matches && currentHeader?.expanded == true) {
 
                         filteredList.add(item)
+
                     }
                 }
             }
         }
-
         val finalList = when (currentSort) {
 
             "Newest" -> filteredList
@@ -354,10 +359,45 @@ class MainActivity : AppCompatActivity() {
         val listItems = mutableListOf<TransactionListItem>()
 
         var currentMonth = ""
+        var firstHeader = true
 
         displayList.forEach { transaction ->
 
-            val parts = transaction.date.split("/")
+            val normalizedDate = try {
+
+                val inputFormats = listOf(
+                    "d/M/yy",
+                    "dd/MM/yyyy"
+                )
+
+                var parsedDate: Date? = null
+
+                for (format in inputFormats) {
+
+                    try {
+                        parsedDate = SimpleDateFormat(
+                            format,
+                            Locale.getDefault()
+                        ).parse(transaction.date)
+
+                        if (parsedDate != null) break
+
+                    } catch (_: Exception) {
+
+                    }
+                }
+
+                SimpleDateFormat(
+                    "dd/MM/yyyy",
+                    Locale.getDefault()
+                ).format(parsedDate!!)
+
+            } catch (e: Exception) {
+
+                transaction.date
+            }
+
+            val parts = normalizedDate.split("/")
 
             val monthName = when (parts[1].toInt()) {
                 1 -> "January"
@@ -381,16 +421,26 @@ class MainActivity : AppCompatActivity() {
                 currentMonth = title
 
                 listItems.add(
-                    TransactionListItem.Header(title)
+                    TransactionListItem.Header(
+                        title = title,
+                        expanded = firstHeader
+                    )
                 )
+
+                firstHeader = false
             }
 
             listItems.add(
                 TransactionListItem.Item(transaction)
             )
+
         }
 
         return listItems
+
+
+
+
     }
     private suspend fun importTransactions() {
 

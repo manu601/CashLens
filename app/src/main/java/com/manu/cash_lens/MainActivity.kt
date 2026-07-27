@@ -24,12 +24,16 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Spinner
 import android.widget.ArrayAdapter
+import com.manu.cash_lens.models.Transaction
+import com.manu.cash_lens.models.TransactionListItem
+import android.widget.AdapterView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var adapter: TransactionAdapter
 
     private var originalList =
         mutableListOf<com.manu.cash_lens.models.TransactionListItem>()
+    private var currentSort = "Newest"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +69,24 @@ class MainActivity : AppCompatActivity() {
         )
 
         spinnerSort.adapter = sortAdapter
+        spinnerSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+
+                currentSort = sortOptions[position]
+
+                updateTransactionList()
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+        }
         val searchBox = findViewById<android.widget.EditText>(R.id.etSearch)
 
         val importButton = findViewById<Button>(R.id.btnImportSms)
@@ -211,45 +233,7 @@ class MainActivity : AppCompatActivity() {
                 outstandingText.text = "KSh %.2f".format(fuliza.outstanding)
                 limitText.text = "KSh %.2f".format(fuliza.availableLimit)
 
-                val listItems = mutableListOf<com.manu.cash_lens.models.TransactionListItem>()
-
-                var currentMonth = ""
-
-                displayList.forEach { transaction ->
-
-                    val parts = transaction.date.split("/")
-
-                    val monthName = when (parts[1].toInt()) {
-                        1 -> "January"
-                        2 -> "February"
-                        3 -> "March"
-                        4 -> "April"
-                        5 -> "May"
-                        6 -> "June"
-                        7 -> "July"
-                        8 -> "August"
-                        9 -> "September"
-                        10 -> "October"
-                        11 -> "November"
-                        else -> "December"
-                    }
-
-                    val title = "$monthName ${parts[2]}"
-
-                    if (title != currentMonth) {
-
-                        currentMonth = title
-
-                        listItems.add(
-                            com.manu.cash_lens.models.TransactionListItem.Header(title)
-                        )
-                    }
-
-                    listItems.add(
-                        com.manu.cash_lens.models.TransactionListItem.Item(transaction)
-                    )
-                }
-
+                val listItems = buildTransactionList(displayList)
                 adapter = TransactionAdapter(listItems)
                 recycler.adapter = adapter
 
@@ -330,6 +314,119 @@ class MainActivity : AppCompatActivity() {
         }
     }
     private fun updateTransactionList() {
+        if (!::adapter.isInitialized) return
+
+        val sorted = when (currentSort) {
+
+            "Newest" ->
+                originalList
+
+            "Oldest" ->
+                originalList.reversed()
+
+            "Highest Amount" -> {
+
+                val headers = mutableListOf<TransactionListItem>()
+
+                val transactions = originalList
+                    .filterIsInstance<TransactionListItem.Item>()
+                    .sortedByDescending { it.transaction.amount }
+
+                headers.addAll(transactions)
+
+                headers
+            }
+
+            "Lowest Amount" -> {
+
+                val headers = mutableListOf<TransactionListItem>()
+
+                val transactions = originalList
+                    .filterIsInstance<TransactionListItem.Item>()
+                    .sortedBy { it.transaction.amount }
+
+                headers.addAll(transactions)
+
+                headers
+            }
+
+            "Recipient A-Z" -> {
+
+                val headers = mutableListOf<TransactionListItem>()
+
+                val transactions = originalList
+                    .filterIsInstance<TransactionListItem.Item>()
+                    .sortedBy { it.transaction.recipient }
+
+                headers.addAll(transactions)
+
+                headers
+            }
+
+            "Recipient Z-A" -> {
+
+                val headers = mutableListOf<TransactionListItem>()
+
+                val transactions = originalList
+                    .filterIsInstance<TransactionListItem.Item>()
+                    .sortedByDescending { it.transaction.recipient }
+
+                headers.addAll(transactions)
+
+                headers
+            }
+
+            else -> originalList
+        }
+
+        adapter.updateData(sorted)
+    }
+    private fun buildTransactionList(
+        displayList: List<Transaction>
+    ): MutableList<TransactionListItem> {
+
+        val listItems = mutableListOf<TransactionListItem>()
+
+        var currentMonth = ""
+
+        displayList.forEach { transaction ->
+
+            val parts = transaction.date.split("/")
+
+            val monthName = when (parts[1].toInt()) {
+                1 -> "January"
+                2 -> "February"
+                3 -> "March"
+                4 -> "April"
+                5 -> "May"
+                6 -> "June"
+                7 -> "July"
+                8 -> "August"
+                9 -> "September"
+                10 -> "October"
+                11 -> "November"
+                else -> "December"
+            }
+
+            val title = "$monthName ${parts[2]}"
+
+            if (title != currentMonth) {
+
+                currentMonth = title
+
+                listItems.add(
+                    TransactionListItem.Header(title)
+                )
+            }
+
+            listItems.add(
+                TransactionListItem.Item(transaction)
+            )
+        }
+
+        return listItems
+    }
+    private suspend fun importTransactions() {
 
     }
 }

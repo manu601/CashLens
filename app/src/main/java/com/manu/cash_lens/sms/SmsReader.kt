@@ -46,6 +46,7 @@ class SmsReader(private val context: Context) {
                 }
 
                 Log.d("MPESA_SMS", body)
+                Log.d("SMS_TEST", body)
 
                 if (
                     provider.equals("MPESA", ignoreCase = true) &&
@@ -77,25 +78,30 @@ class SmsReader(private val context: Context) {
                     }
 
 
-                         val type = when {
+                    val type = when {
 
-                             body.contains("fully pay your outstanding Fuliza", true) ||
-                                     body.contains("partially pay your outstanding Fuliza", true) ->
-                                 "Fuliza Repayment"
+                        body.contains("fully pay your outstanding Fuliza", true) ||
+                                body.contains("partially pay your outstanding Fuliza", true) ->
+                            "Fuliza Repayment"
 
-                             body.contains("sent to", true) ->
-                                 "Sent"
+                        body.contains("received", true) ->
+                            "Received"
 
-                             body.contains("received", true) ->
-                                 "Received"
+                        body.contains("withdraw", true) ->
+                            "Withdraw"
 
-                             body.contains("paid to", true) ->
-                                 "PayBill"
+                        body.contains("sent to", true) ->
+                            "Sent"
 
-                             else ->
-                                 "Other"
-                         }
+                        body.contains("paid to", true) ->
+                            "PayBill"
 
+                        else ->
+                            "Other"
+                    }
+
+                    Log.d("TYPE_DEBUG", "Type = $type")
+                    Log.d("TYPE_DEBUG", body)
 
                          val recipient = when(type) {
 
@@ -126,6 +132,22 @@ class SmsReader(private val context: Context) {
                             if (match.find()) match.group(1)
                             else "Unknown"
                         }
+                             "Withdraw" -> {
+
+                                 val regex = Pattern.compile(
+                                     "from\\s+(.+?)\\s+New M-PESA",
+                                     Pattern.CASE_INSENSITIVE
+                                 )
+
+                                 val match = regex.matcher(body)
+
+                                 if (match.find()) {
+                                     match.group(1).trim()
+                                 } else {
+                                     "Cash Withdrawal"
+                                 }
+                             }
+
 
 
                         "PayBill" -> {
@@ -256,6 +278,7 @@ class SmsReader(private val context: Context) {
 
                     messages.add(transaction)
                 }
+
             }
         }
 

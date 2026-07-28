@@ -1,126 +1,136 @@
 package com.manu.cash_lens
 
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.manu.cash_lens.database.CashLensDatabase
 import com.manu.cash_lens.repository.TransactionRepository
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class AnalyticsActivity : AppCompatActivity() {
 
     private lateinit var repository: TransactionRepository
 
-    private lateinit var txtTotalReceived: TextView
-    private lateinit var txtTotalSent: TextView
-    private lateinit var txtTotalPayBill: TextView
+    private lateinit var txtSelectedMonth: TextView
+
+    private lateinit var txtMoneyIn: TextView
+    private lateinit var txtMoneyOut: TextView
+    private lateinit var txtNetCashFlow: TextView
+
+    private lateinit var txtLargestExpense: TextView
+    private lateinit var txtMostPaidRecipient: TextView
+    private lateinit var txtCategory: TextView
     private lateinit var txtTransactionCount: TextView
 
+    private lateinit var btnPreviousMonth: ImageButton
+    private lateinit var btnNextMonth: ImageButton
+    private val selectedMonth = java.util.Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_analytics)
 
         val database = CashLensDatabase.getDatabase(this)
         repository = TransactionRepository(database.transactionDao())
 
-        txtTotalReceived = findViewById(R.id.txtTotalReceived)
-        txtTotalSent = findViewById(R.id.txtTotalSent)
-        txtTotalPayBill = findViewById(R.id.txtTotalPayBill)
+        txtSelectedMonth = findViewById(R.id.txtSelectedMonth)
+
+        txtMoneyIn = findViewById(R.id.txtMoneyIn)
+        txtMoneyOut = findViewById(R.id.txtMoneyOut)
+        txtNetCashFlow = findViewById(R.id.txtNetCashFlow)
+
+        txtLargestExpense = findViewById(R.id.txtLargestExpense)
+        txtMostPaidRecipient = findViewById(R.id.txtMostPaidRecipient)
+        txtCategory = findViewById(R.id.txtCategory)
         txtTransactionCount = findViewById(R.id.txtTransactionCount)
 
+        btnPreviousMonth = findViewById(R.id.btnPreviousMonth)
+        btnNextMonth = findViewById(R.id.btnNextMonth)
+        btnPreviousMonth.setOnClickListener {
 
-        val btnToday = findViewById<Button>(R.id.btnToday)
-        val btnWeek = findViewById<Button>(R.id.btnWeek)
-        val btnMonth = findViewById<Button>(R.id.btnMonth)
+            selectedMonth.add(Calendar.MONTH, -1)
 
+            updateMonthTitle()
 
-        btnToday.setOnClickListener {
-            loadAnalytics(getTodayStart())
+            loadAnalytics()
+
         }
 
+        btnNextMonth.setOnClickListener {
 
-        btnWeek.setOnClickListener {
-            loadAnalytics(getWeekStart())
+            selectedMonth.add(Calendar.MONTH, 1)
+
+            updateMonthTitle()
+
+            loadAnalytics()
+
         }
 
-
-        btnMonth.setOnClickListener {
-            loadAnalytics(getMonthStart())
-        }
-
-
-        // Default view
-        loadAnalytics(getMonthStart())
+        updateMonthTitle()
+        loadAnalytics()
     }
+    private fun updateMonthTitle() {
 
+        val formatter = SimpleDateFormat(
+            "MMMM yyyy",
+            Locale.getDefault()
+        )
 
-    private fun loadAnalytics(startTime: Long) {
+        txtSelectedMonth.text = formatter.format(selectedMonth.time)
+    }
+    private fun loadAnalytics() {
 
         lifecycleScope.launch {
 
-            val received = repository.getReceivedSince(startTime)
-            val sent = repository.getSentSince(startTime)
-            val payBill = repository.getPayBillSince(startTime)
+            val start = selectedMonth.clone() as Calendar
 
-            txtTotalReceived.text =
-                "Money In\nKSh %.2f".format(received)
+            start.set(Calendar.DAY_OF_MONTH, 1)
+            start.set(Calendar.HOUR_OF_DAY, 0)
+            start.set(Calendar.MINUTE, 0)
+            start.set(Calendar.SECOND, 0)
+            start.set(Calendar.MILLISECOND, 0)
 
-            txtTotalSent.text =
-                "Money Out\nKSh %.2f".format(sent)
+            val end = selectedMonth.clone() as Calendar
 
-            txtTotalPayBill.text =
-                "PayBill\nKSh %.2f".format(payBill)
+            end.set(
+                Calendar.DAY_OF_MONTH,
+                end.getActualMaximum(Calendar.DAY_OF_MONTH)
+            )
+            end.set(Calendar.HOUR_OF_DAY, 23)
+            end.set(Calendar.MINUTE, 59)
+            end.set(Calendar.SECOND, 59)
+            end.set(Calendar.MILLISECOND, 999)
 
-            val count = repository.getTransactionCount()
+            val startTime = start.timeInMillis
+            val endTime = end.timeInMillis
+
+            val received =
+                repository.getReceivedBetween(startTime, endTime)
+
+            val spent =
+                repository.getSpentBetween(startTime, endTime)
+
+            val transactionCount =
+                repository.getTransactionCountBetween(startTime, endTime)
+
+            val netCashFlow = received - spent
+
+            txtMoneyIn.text =
+                "KSh %.2f".format(received)
+
+            txtMoneyOut.text =
+                "KSh %.2f".format(spent)
+
+            txtNetCashFlow.text =
+                "KSh %.2f".format(netCashFlow)
 
             txtTransactionCount.text =
-                "Transactions\n$count"
+                transactionCount.toString()
         }
-    }
-
-
-    private fun getTodayStart(): Long {
-
-        return Calendar.getInstance().apply {
-
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-
-        }.timeInMillis
-    }
-
-
-    private fun getWeekStart(): Long {
-
-        return Calendar.getInstance().apply {
-
-            set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-
-        }.timeInMillis
-    }
-
-
-    private fun getMonthStart(): Long {
-
-        return Calendar.getInstance().apply {
-
-            set(Calendar.DAY_OF_MONTH, 1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-
-        }.timeInMillis
     }
 }

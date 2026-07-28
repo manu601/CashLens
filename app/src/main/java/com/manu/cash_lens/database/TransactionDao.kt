@@ -76,7 +76,7 @@ interface TransactionDao {
     @Query("""
     SELECT COALESCE(SUM(amount),0)
     FROM transactions
-    WHERE type IN ('Sent','PayBill','FulizaRepayment')
+    WHERE type IN ('Sent','PayBill','Withdraw')
 """)
     suspend fun getTotalSpent(): Double
 
@@ -90,8 +90,40 @@ interface TransactionDao {
     @Query("""
     SELECT COALESCE(SUM(amount),0)
     FROM transactions
-    WHERE type IN ('Sent','PayBill','Fuliza Repayment')
+    WHERE type IN ('Sent','PayBill','Withdraw','Fuliza Repayment')
     AND smsTimestamp >= :startTime
 """)
     suspend fun getSpentSince(startTime: Long): Double
+
+    @Query("""
+SELECT COALESCE(SUM(amount),0)
+FROM transactions
+WHERE type='Received'
+AND smsTimestamp BETWEEN :startTime AND :endTime
+""")
+    suspend fun getReceivedBetween(
+        startTime: Long,
+        endTime: Long
+    ): Double
+
+    @Query("""
+SELECT COALESCE(SUM(amount),0)
+FROM transactions
+WHERE type IN ('Sent','PayBill','Withdraw')
+AND smsTimestamp BETWEEN :startTime AND :endTime
+""")
+    suspend fun getSpentBetween(
+        startTime: Long,
+        endTime: Long
+    ): Double
+
+    @Query("""
+SELECT COUNT(*)
+FROM transactions
+WHERE smsTimestamp BETWEEN :startTime AND :endTime
+""")
+    suspend fun getTransactionCountBetween(
+        startTime: Long,
+        endTime: Long
+    ): Int
 }

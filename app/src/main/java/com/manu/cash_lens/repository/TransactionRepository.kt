@@ -65,4 +65,20 @@ class TransactionRepository(
     suspend fun getSpentSince(startTime: Long): Double {
         return transactionDao.getSpentSince(startTime)
     }
+    suspend fun getReceivedBetween(
+        startTime: Long,
+        endTime: Long
+    ) = transactionDao.getReceivedBetween(startTime, endTime)
+
+
+    suspend fun getSpentBetween(
+        startTime: Long,
+        endTime: Long
+    ) = transactionDao.getSpentBetween(startTime, endTime)
+
+
+    suspend fun getTransactionCountBetween(
+        startTime: Long,
+        endTime: Long
+    ) = transactionDao.getTransactionCountBetween(startTime, endTime)
 }

@@ -122,6 +122,7 @@ class TransactionAdapter(
                     }
 
                     "PayBill",
+                    "Withdraw",
                     "Fuliza Repayment" -> {
 
                         viewHolder.amount.setTextColor(
@@ -152,6 +153,11 @@ class TransactionAdapter(
                     "PayBill" ->
                         viewHolder.type.setTextColor(
                             Color.parseColor("#1976D2")
+                        )
+
+                    "Withdraw" ->
+                        viewHolder.type.setTextColor(
+                            Color.parseColor("#EF6C00")
                         )
 
                     "Fuliza Repayment" ->
